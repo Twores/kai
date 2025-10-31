@@ -73,6 +73,21 @@
     gap: 8px;
   }
 
+
+.directory-col-header-bt {
+  background-color: #2e3b4b;
+  color: #e8f0fd;
+  border: 1px solid #3b4a5e;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: default;
+  font-family: 'Montserrat';
+  font-size: 16px;
+  min-width: 300px;
+  min-height: 50px;
+}
+
 .dash-btn:hover { border-color: #54739a; }
 
 .dash-btn-primary { background-color: #2f7ddc; border-color: #2f7ddc; }
@@ -159,6 +174,14 @@
 
 
 /* Справочники */
+.directory-header-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid #223142;
+}
+
 .directory-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -176,10 +199,66 @@
   max-width: 413px;
 }
 
+.directory-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid #223142;
+}
+
+.directory-col-header-btn {
+  background-color: #2f7ddc;
+  border: 1px solid #2f7ddc;
+  color: #e8f0fd;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 700;
+  font-family: 'Montserrat';
+  font-size: 16px;
+  cursor: default;
+  white-space: nowrap;
+  flex-shrink: 0;
+  opacity: 1;
+}
+
+.directory-col-header-btn:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
 .directory-col-header {
   padding: 12px;
   font-weight: 700;
   border-bottom: 1px solid #223142;
+}
+
+.directory-search-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  background-color: #fff;
+  border: 1px solid #3b4a5e;
+  border-radius: 8px;
+  padding: 6px 10px;
+  min-height: 50px;
+}
+
+.directory-search {
+  background-color: transparent;
+  border: none;
+  color: #000;
+  flex: 1;
+  padding: 0;
+  outline: none;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Montserrat';
+}
+
+.directory-search::placeholder {
+  color: #999999;
 }
 
 .directory-list {
