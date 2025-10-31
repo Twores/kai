@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Input from '../Input/Input';
 import Button from '../Button/Button';
+import { login } from '../../services/api';
 import './LoginForm.css';
 
 const LoginForm = ({ onSuccess }) => {
@@ -26,24 +27,7 @@ const LoginForm = ({ onSuccess }) => {
     setLoading(true);
 
     try {
-      const apiUrl = `${window.location.origin}/auth/login`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: formData.login,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Ошибка авторизации');
-      }
-
+      const data = await login(formData.login, formData.password);
       if (onSuccess) {
         onSuccess(data);
       }

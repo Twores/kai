@@ -3,7 +3,7 @@
  * Базовый URL берется из переменной окружения REACT_APP_API_URL
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8088';
+const API_BASE_URL = process.env.REACT_APP_API_URL || window.location.origin;
 
 /**
  * Базовая функция для выполнения запросов
@@ -36,6 +36,18 @@ async function apiRequest(endpoint, options = {}) {
     console.error(`[API Error] ${url}:`, error);
     throw error;
   }
+}
+
+// ==================== АВТОРИЗАЦИЯ ====================
+
+/**
+ * Авторизация пользователя
+ */
+export async function login(username, password) {
+  return apiRequest('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  });
 }
 
 // ==================== ЗАДАНИЯ ====================
