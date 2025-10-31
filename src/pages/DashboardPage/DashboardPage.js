@@ -522,7 +522,7 @@ const DashboardPage = () => {
       setTasks(mappedTasks);
     } catch (error) {
       console.error('Ошибка загрузки заданий:', error);
-      alert(`Ошибка загрузки заданий: ${error.message}`);
+      //alert(`Ошибка загрузки заданий: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -542,7 +542,7 @@ const DashboardPage = () => {
       setSettings(settingsData);
     } catch (error) {
       console.error('Ошибка загрузки настроек:', error);
-      alert(`Ошибка загрузки настроек: ${error.message}`);
+      //alert(`Ошибка загрузки настроек: ${error.message}`);
     }
   };
 
@@ -557,7 +557,7 @@ const DashboardPage = () => {
       });
     } catch (error) {
       console.error('Ошибка загрузки справочников:', error);
-      alert(`Ошибка загрузки справочников: ${error.message}`);
+      //alert(`Ошибка загрузки справочников: ${error.message}`);
     }
   };
 
@@ -607,7 +607,7 @@ const DashboardPage = () => {
       await loadTasks();
     } catch (error) {
       console.error('Ошибка удаления задания:', error);
-      alert(`Ошибка удаления задания: ${error.message}`);
+      //alert(`Ошибка удаления задания: ${error.message}`);
     }
   };
 
@@ -625,7 +625,7 @@ const DashboardPage = () => {
 
     // Валидация обязательных полей
     if (!task.func || !task.date || !task.slot || !task.plate || !task.driver) {
-      alert('Заполните обязательные поля: Функция, Дата старта, Слот, Гос. номер, Водитель');
+      //alert('Заполните обязательные поля: Функция, Дата старта, Слот, Гос. номер, Водитель');
       return;
     }
 
@@ -643,7 +643,7 @@ const DashboardPage = () => {
       }
     } catch (error) {
       console.error('Ошибка сохранения задания:', error);
-      alert(`Ошибка сохранения задания: ${error.message}`);
+      //alert(`Ошибка сохранения задания: ${error.message}`);
     }
   };
 
@@ -667,7 +667,7 @@ const DashboardPage = () => {
         .map(task => task.id);
       
       if (allTasks.length === 0) {
-        alert('Нет заданий для запуска');
+        //alert('Нет заданий для запуска');
         return;
       }
       selectedTasks.push(...allTasks);
@@ -675,11 +675,11 @@ const DashboardPage = () => {
 
     try {
       await api.startAutomation(selectedTasks, false);
-      alert('Автоматизация запущена поочередно');
+      //alert('Автоматизация запущена поочередно');
       await loadTasks();
     } catch (error) {
       console.error('Ошибка запуска автоматизации:', error);
-      alert(`Ошибка запуска автоматизации: ${error.message}`);
+      //alert(`Ошибка запуска автоматизации: ${error.message}`);
     }
   };
 
@@ -696,7 +696,7 @@ const DashboardPage = () => {
         .map(task => task.id);
       
       if (allTasks.length === 0) {
-        alert('Нет заданий для запуска');
+        //alert('Нет заданий для запуска');
         return;
       }
       selectedTasks.push(...allTasks);
@@ -704,11 +704,11 @@ const DashboardPage = () => {
 
     try {
       await api.startAutomation(selectedTasks, true);
-      alert('Автоматизация запущена параллельно');
+      //alert('Автоматизация запущена параллельно');
       await loadTasks();
     } catch (error) {
       console.error('Ошибка запуска автоматизации:', error);
-      alert(`Ошибка запуска автоматизации: ${error.message}`);
+      //alert(`Ошибка запуска автоматизации: ${error.message}`);
     }
   };
 
@@ -716,11 +716,11 @@ const DashboardPage = () => {
   const handleStopAutomation = async () => {
     try {
       await api.stopAutomation();
-      alert('Автоматизация остановлена');
+      //alert('Автоматизация остановлена');
       await loadTasks();
     } catch (error) {
       console.error('Ошибка остановки автоматизации:', error);
-      alert(`Ошибка остановки автоматизации: ${error.message}`);
+      //alert(`Ошибка остановки автоматизации: ${error.message}`);
     }
   };
 
@@ -732,7 +732,7 @@ const DashboardPage = () => {
   // Проверить подключение
   const handleTestConnection = async () => {
     if (!settings.site_url || !settings.login || !settings.password) {
-      alert('Заполните URL сайта, логин и пароль');
+      //alert('Заполните URL сайта, логин и пароль');
       return;
     }
 
@@ -744,13 +744,13 @@ const DashboardPage = () => {
       });
 
       if (result.success) {
-        alert(`✅ ${result.message} (${result.duration}ms)`);
+        //alert(`✅ ${result.message} (${result.duration}ms)`);
       } else {
-        alert(`❌ ${result.message}: ${result.error}`);
+        //alert(`❌ ${result.message}: ${result.error}`);
       }
     } catch (error) {
       console.error('Ошибка проверки подключения:', error);
-      alert(`Ошибка проверки подключения: ${error.message}`);
+      //alert(`Ошибка проверки подключения: ${error.message}`);
     }
   };
 
@@ -758,11 +758,11 @@ const DashboardPage = () => {
   const handleSaveSettings = async () => {
     try {
       await api.saveSettings(settings);
-      alert('Настройки сохранены');
+      //alert('Настройки сохранены');
       await loadSettings();
     } catch (error) {
       console.error('Ошибка сохранения настроек:', error);
-      alert(`Ошибка сохранения настроек: ${error.message}`);
+      //alert(`Ошибка сохранения настроек: ${error.message}`);
     }
   };
 
@@ -773,11 +773,11 @@ const DashboardPage = () => {
 
     try {
       await api.addReference(type, value);
-      alert(`${label} добавлен`);
+      //alert(`${label} добавлен`);
       await loadReferences();
     } catch (error) {
       console.error(`Ошибка добавления ${label}:`, error);
-      alert(`Ошибка добавления ${label}: ${error.message}`);
+      //alert(`Ошибка добавления ${label}: ${error.message}`);
     }
   };
 
@@ -792,7 +792,7 @@ const DashboardPage = () => {
       await loadReferences();
     } catch (error) {
       console.error(`Ошибка удаления ${label}:`, error);
-      alert(`Ошибка удаления ${label}: ${error.message}`);
+      //alert(`Ошибка удаления ${label}: ${error.message}`);
     }
   };
 

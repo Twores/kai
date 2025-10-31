@@ -8,6 +8,8 @@ const LoginForm = ({ onSuccess }) => {
     login: '',
     password: '',
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,11 +17,41 @@ const LoginForm = ({ onSuccess }) => {
       ...prev,
       [name]: value,
     }));
+    setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (onSuccess) onSuccess();
+    setError('');
+    setLoading(true);
+
+    try {
+      const apiUrl = `${window.location.origin}/auth/login`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.login,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Ошибка авторизации');
+      }
+
+      if (onSuccess) {
+        onSuccess(data);
+      }
+    } catch (err) {
+      setError(err.message || 'Произошла ошибка при входе');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,7 +72,10 @@ const LoginForm = ({ onSuccess }) => {
         onChange={handleChange}
         placeholder="Введите пароль"
       />
-      <Button type="submit">Войти</Button>
+      {error && <div className="login-error">{error}</div>}
+      <Button type="submit" disabled={loading}>
+        {loading ? 'Вход...' : 'Войти'}
+      </Button>
     </form>
   );
 };

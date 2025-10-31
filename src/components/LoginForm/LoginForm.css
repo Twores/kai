@@ -3,6 +3,16 @@
   flex-direction: column;
   width: 100%;
   max-width: 500px;
+  gap: 12px;
+}
+
+.login-error {
+  color: #d32f2f;
+  background-color: #ffebee;
+  border: 1px solid #d32f2f;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
 }
 
 
