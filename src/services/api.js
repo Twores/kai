@@ -22,7 +22,16 @@ async function apiRequest(endpoint, options = {}) {
 
   try {
     const response = await fetch(url, config);
-    const data = await response.json();
+    
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      // Если не получилось распарсить JSON, значит ответ не JSON
+      console.error(`[API Error] ${url}: Not a JSON response`);
+      console.error(`[API Error] Status: ${response.status}, Content-Type: ${response.headers.get('content-type')}`);
+      throw new Error('Сервер вернул не JSON ответ. Возможно неправильный URL API или сервер не запущен.');
+    }
 
     if (!response.ok) {
       const errorMessage = data.detail || data.message || `HTTP ${response.status}`;
@@ -33,6 +42,9 @@ async function apiRequest(endpoint, options = {}) {
     console.log(`[API Success] ${url}:`, data);
     return data;
   } catch (error) {
+    if (error.message.startsWith('Сервер вернул не JSON ответ')) {
+      throw error;
+    }
     console.error(`[API Error] ${url}:`, error);
     throw error;
   }
