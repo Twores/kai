@@ -278,10 +278,13 @@ const SettingsPanel = ({
   );
 };
 
-const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask }) => {
+const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, carNumbers = [], drivers = [], terminalContracts = [], timeSlots = [], operationTypes = [] }) => {
   const handleChange = (taskId, field, value) => {
     onTaskChange(taskId, field, value);
   };
+
+  // Отладка: проверим, какие данные приходят
+  console.log('TaskTable operationTypes:', operationTypes);
 
   return (
     <div className="table-wrapper">
@@ -303,7 +306,7 @@ const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask }
         <tbody>
           {tasks.map((task) => (
             <tr key={task.id}>
-              <td>
+              <td className="checkbox-cell">
                 <input 
                   type="checkbox" 
                   checked={task.checked}
@@ -328,26 +331,46 @@ const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask }
               </td>
               <td>
                 {task.isNew || task.isEditing ? (
-                  <input 
-                    type="text" 
-                    className="table-input" 
+                  <select 
+                    className="table-input table-select" 
                     value={task.func || ''}
                     onChange={(e) => handleChange(task.id, 'func', e.target.value)}
-                    placeholder="Функция"
-                  />
+                  >
+                    <option value=""></option>
+                    {operationTypes && operationTypes.length > 0 ? (
+                      operationTypes.filter(item => item.is_active).map((item) => (
+                        <option key={item.id} value={item.value}>
+                          {item.value}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>Загрузка...</option>
+                    )}
+                    {task.func && operationTypes && !operationTypes.some(item => item.is_active && item.value === task.func) && (
+                      <option value={task.func}>{task.func}</option>
+                    )}
+                  </select>
                 ) : (
                   task.func
                 )}
               </td>
               <td>
                 {task.isNew || task.isEditing ? (
-                  <input 
-                    type="text" 
-                    className="table-input" 
+                  <select 
+                    className="table-input table-select" 
                     value={task.slot || ''}
                     onChange={(e) => handleChange(task.id, 'slot', e.target.value)}
-                    placeholder="Слот (время)"
-                  />
+                  >
+                    <option value=""></option>
+                    {timeSlots.filter(item => item.is_active).map((item) => (
+                      <option key={item.id} value={item.value}>
+                        {item.value}
+                      </option>
+                    ))}
+                    {task.slot && !timeSlots.some(item => item.is_active && item.value === task.slot) && (
+                      <option value={task.slot}>{task.slot}</option>
+                    )}
+                  </select>
                 ) : (
                   task.slot
                 )}
@@ -380,26 +403,42 @@ const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask }
               </td>
               <td>
                 {task.isNew || task.isEditing ? (
-                  <input 
-                    type="text" 
-                    className="table-input" 
+                  <select 
+                    className="table-input table-select" 
                     value={task.plate || ''}
                     onChange={(e) => handleChange(task.id, 'plate', e.target.value)}
-                    placeholder="Гос. номер"
-                  />
+                  >
+                    <option value=""></option>
+                    {carNumbers.filter(item => item.is_active).map((item) => (
+                      <option key={item.id} value={item.value}>
+                        {item.value}
+                      </option>
+                    ))}
+                    {task.plate && !carNumbers.some(item => item.is_active && item.value === task.plate) && (
+                      <option value={task.plate}>{task.plate}</option>
+                    )}
+                  </select>
                 ) : (
                   task.plate
                 )}
               </td>
               <td className="driver-cell">
                 {task.isNew || task.isEditing ? (
-                  <input 
-                    type="text" 
-                    className="table-input" 
+                  <select 
+                    className="table-input table-select" 
                     value={task.driver || ''}
                     onChange={(e) => handleChange(task.id, 'driver', e.target.value)}
-                    placeholder="Водитель"
-                  />
+                  >
+                    <option value=""></option>
+                    {drivers.filter(item => item.is_active).map((item) => (
+                      <option key={item.id} value={item.value}>
+                        {item.value}
+                      </option>
+                    ))}
+                    {task.driver && !drivers.some(item => item.is_active && item.value === task.driver) && (
+                      <option value={task.driver}>{task.driver}</option>
+                    )}
+                  </select>
                 ) : (
                   task.driver
                 )}
@@ -407,13 +446,21 @@ const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask }
               <td style={{ position: 'relative' }}>
                 {task.isNew || task.isEditing ? (
                   <>
-                    <input 
-                      type="text" 
-                      className="table-input" 
+                    <select 
+                      className="table-input table-select" 
                       value={task.contract || ''}
                       onChange={(e) => handleChange(task.id, 'contract', e.target.value)}
-                      placeholder="Договор"
-                    />
+                    >
+                      <option value=""></option>
+                      {terminalContracts.filter(item => item.is_active).map((item) => (
+                        <option key={item.id} value={item.value}>
+                          {item.value}
+                        </option>
+                      ))}
+                      {task.contract && !terminalContracts.some(item => item.is_active && item.value === task.contract) && (
+                        <option value={task.contract}>{task.contract}</option>
+                      )}
+                    </select>
                     <div className="action-icons">
                       <button 
                         className="action-btn action-btn-send" 
@@ -464,7 +511,9 @@ const DashboardPage = () => {
   const [references, setReferences] = useState({
     car_numbers: [],
     drivers: [],
-    terminal_contracts: []
+    terminal_contracts: [],
+    time_slots: [],
+    operation_types: []
   });
   const [loading, setLoading] = useState(false);
   const [searchDirectory, setSearchDirectory] = useState('');
@@ -532,6 +581,7 @@ const DashboardPage = () => {
   useEffect(() => {
     if (activeScreen === 'tasks') {
       loadTasks();
+      loadReferences(); // Загружаем справочники для формы создания задания
     }
   }, [activeScreen]);
 
@@ -550,10 +600,13 @@ const DashboardPage = () => {
   const loadReferences = async () => {
     try {
       const refs = await api.getReferences();
+      console.log('Справочники загружены:', refs); // Отладка
       setReferences({
         car_numbers: refs.car_numbers || [],
         drivers: refs.drivers || [],
-        terminal_contracts: refs.terminal_contracts || []
+        terminal_contracts: refs.terminal_contracts || [],
+        time_slots: refs.time_slots || [],
+        operation_types: refs.operation_types || []
       });
     } catch (error) {
       console.error('Ошибка загрузки справочников:', error);
@@ -630,6 +683,53 @@ const DashboardPage = () => {
     }
 
     try {
+      // Проверяем и добавляем недостающие элементы в справочники
+      // Проверяем по всем элементам (не только активным), чтобы не дублировать
+      
+      // Проверяем тип операции (функция)
+      if (task.func) {
+        const operationExists = references.operation_types.some(item => item.value === task.func);
+        if (!operationExists) {
+          await api.addReference('operations', task.func);
+        }
+      }
+      
+      // Проверяем гос. номер
+      if (task.plate) {
+        const plateExists = references.car_numbers.some(item => item.value === task.plate);
+        if (!plateExists) {
+          await api.addReference('autos', task.plate);
+        }
+      }
+
+      // Проверяем водителя
+      if (task.driver) {
+        const driverExists = references.drivers.some(item => item.value === task.driver);
+        if (!driverExists) {
+          await api.addReference('drivers', task.driver);
+        }
+      }
+
+      // Проверяем договор
+      if (task.contract) {
+        const contractExists = references.terminal_contracts.some(item => item.value === task.contract);
+        if (!contractExists) {
+          await api.addReference('contracts', task.contract);
+        }
+      }
+
+      // Проверяем временной слот
+      if (task.slot) {
+        const slotExists = references.time_slots.some(item => item.value === task.slot);
+        if (!slotExists) {
+          await api.addReference('timeslots', task.slot);
+        }
+      }
+
+      // Обновляем справочники после добавления
+      await loadReferences();
+
+      // Теперь сохраняем задание
       const taskData = mapTaskToAPI(task);
       
       if (task.isNew || taskId.toString().startsWith('temp-')) {
@@ -832,6 +932,11 @@ const DashboardPage = () => {
             onTaskChange={handleTaskChange}
             onSaveTask={handleSaveTask}
             onEditTask={handleEditTask}
+            carNumbers={references.car_numbers}
+            drivers={references.drivers}
+            terminalContracts={references.terminal_contracts}
+            timeSlots={references.time_slots}
+            operationTypes={references.operation_types}
           />
         </>
       ) : (
