@@ -107,6 +107,10 @@ const DirectoryPanel = ({
   searchDirectory,
   setSearchDirectory
 }) => {
+  const [newContract, setNewContract] = useState('');
+  const [newDriver, setNewDriver] = useState('');
+  const [newPlate, setNewPlate] = useState('');
+
   // Фильтрация списков по поиску
   const filteredContracts = contracts.filter(contract => 
     contract.value && contract.value.toLowerCase().includes(searchDirectory.toLowerCase())
@@ -117,6 +121,27 @@ const DirectoryPanel = ({
   const filteredPlates = plates.filter(plate => 
     plate.value && plate.value.toLowerCase().includes(searchDirectory.toLowerCase())
   );
+
+  const handleAddContract = () => {
+    if (newContract.trim()) {
+      onAddContract(newContract.trim());
+      setNewContract('');
+    }
+  };
+
+  const handleAddDriver = () => {
+    if (newDriver.trim()) {
+      onAddDriver(newDriver.trim());
+      setNewDriver('');
+    }
+  };
+
+  const handleAddPlate = () => {
+    if (newPlate.trim()) {
+      onAddPlate(newPlate.trim());
+      setNewPlate('');
+    }
+  };
 
   return (
     <div className="dash-panel">
@@ -150,7 +175,28 @@ const DirectoryPanel = ({
             ))}
           </div>
           <div className="directory-actions">
-            <button className="dash-btn dash-btn-primary" onClick={onAddContract}><Icon name="circle-plus" width={18} height={18} />Добавить договор</button>
+            <div className="directory-add-input-container">
+              <input
+                className="directory-add-input"
+                type="text"
+                placeholder="Введите договор"
+                value={newContract}
+                onChange={(e) => setNewContract(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAddContract();
+                  }
+                }}
+              />
+              <button 
+                className="directory-add-btn" 
+                onClick={handleAddContract}
+                disabled={!newContract.trim()}
+                title="Добавить"
+              >
+                <Icon name="circle-plus" width={18} height={18} />
+              </button>
+            </div>
           </div>
         </div>
         <div className="directory-col">
@@ -170,7 +216,28 @@ const DirectoryPanel = ({
             ))}
           </div>
           <div className="directory-actions">
-            <button className="dash-btn dash-btn-primary" onClick={onAddDriver}><Icon name="circle-plus" width={18} height={18} />Добавить водителя</button>
+            <div className="directory-add-input-container">
+              <input
+                className="directory-add-input"
+                type="text"
+                placeholder="Введите водителя"
+                value={newDriver}
+                onChange={(e) => setNewDriver(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAddDriver();
+                  }
+                }}
+              />
+              <button 
+                className="directory-add-btn" 
+                onClick={handleAddDriver}
+                disabled={!newDriver.trim()}
+                title="Добавить"
+              >
+                <Icon name="circle-plus" width={18} height={18} />
+              </button>
+            </div>
           </div>
         </div>
         <div className="directory-col">
@@ -190,7 +257,28 @@ const DirectoryPanel = ({
             ))}
           </div>
           <div className="directory-actions">
-            <button className="dash-btn dash-btn-primary" onClick={onAddPlate}><Icon name="circle-plus" width={18} height={18} />Добавить гос. номер</button>
+            <div className="directory-add-input-container">
+              <input
+                className="directory-add-input"
+                type="text"
+                placeholder="Введите гос. номер"
+                value={newPlate}
+                onChange={(e) => setNewPlate(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAddPlate();
+                  }
+                }}
+              />
+              <button 
+                className="directory-add-btn" 
+                onClick={handleAddPlate}
+                disabled={!newPlate.trim()}
+                title="Добавить"
+              >
+                <Icon name="circle-plus" width={18} height={18} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -203,8 +291,16 @@ const SettingsPanel = ({
   settings = {},
   onSettingsChange,
   onTestConnection,
-  onSaveSettings
+  onSaveSettings,
+  connectionStatus = null,
+  isTestingConnection = false
 }) => {
+  const getConnectionStatusClass = () => {
+    if (connectionStatus === 'success') return 'dash-btn-success';
+    if (connectionStatus === 'error') return 'dash-btn-error';
+    return '';
+  };
+
   return (
     <div className="dash-panel settings-panel">
       <div className="settings-form">
@@ -249,8 +345,10 @@ const SettingsPanel = ({
           <label>URL сайта:</label>
           <input 
             className="form-input" 
+            type="text"
             value={settings.site_url || ''}
             onChange={(e) => onSettingsChange('site_url', e.target.value)}
+            placeholder="https://example.com"
           />
         </div>
         <div className="form-row">
@@ -271,14 +369,28 @@ const SettingsPanel = ({
           />
         </div>
         <div className="form-actions">
-          <button className="dash-btn" onClick={onTestConnection}>Проверить подключение</button>
+          <div className="connection-status-container">
+            {connectionStatus !== null && (
+              <span 
+                className={`connection-status-indicator ${connectionStatus === 'success' ? 'connection-success' : 'connection-error'}`}
+                title={connectionStatus === 'success' ? 'Подключение установлено' : 'Подключение отсутствует'}
+              />
+            )}
+            <button 
+              className={`dash-btn ${getConnectionStatusClass()}`} 
+              onClick={onTestConnection}
+              disabled={isTestingConnection}
+            >
+              {isTestingConnection ? 'Проверка...' : 'Проверить подключение'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, carNumbers = [], drivers = [], terminalContracts = [], timeSlots = [], operationTypes = [] }) => {
+const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, carNumbers = [], drivers = [], terminalContracts = [], timeSlots = [], operationTypes = [], isTaskValid }) => {
   const handleChange = (taskId, field, value) => {
     onTaskChange(taskId, field, value);
   };
@@ -465,6 +577,7 @@ const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, 
                       <button 
                         className="action-btn action-btn-send" 
                         onClick={() => onSaveTask(task.id)}
+                        disabled={!isTaskValid(task)}
                         aria-label="Отправить"
                         title="Отправить"
                       >
@@ -517,6 +630,8 @@ const DashboardPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [searchDirectory, setSearchDirectory] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState(null); // 'success', 'error', null
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
 
   // Преобразование данных из API в формат UI
   const mapTaskFromAPI = (apiTask) => {
@@ -671,14 +786,18 @@ const DashboardPage = () => {
     ));
   };
 
+  // Проверка, заполнены ли все обязательные поля
+  const isTaskValid = (task) => {
+    return !!(task.func && task.date && task.slot && task.plate && task.driver && task.contract);
+  };
+
   // Сохранить задание (создать или обновить)
   const handleSaveTask = async (taskId) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    // Валидация обязательных полей
-    if (!task.func || !task.date || !task.slot || !task.plate || !task.driver) {
-      //alert('Заполните обязательные поля: Функция, Дата старта, Слот, Гос. номер, Водитель');
+    // Валидация обязательных полей - просто возвращаемся без сообщения
+    if (!isTaskValid(task)) {
       return;
     }
 
@@ -827,15 +946,21 @@ const DashboardPage = () => {
   // Изменить настройки
   const handleSettingsChange = (field, value) => {
     setSettings(prev => ({ ...prev, [field]: value }));
+    // Сбрасываем статус подключения при изменении URL, логина или пароля
+    if (field === 'site_url' || field === 'login' || field === 'password') {
+      setConnectionStatus(null);
+    }
   };
 
   // Проверить подключение
   const handleTestConnection = async () => {
     if (!settings.site_url || !settings.login || !settings.password) {
       //alert('Заполните URL сайта, логин и пароль');
+      setConnectionStatus('error');
       return;
     }
 
+    setIsTestingConnection(true);
     try {
       const result = await api.testConnection({
         site_url: settings.site_url,
@@ -844,13 +969,18 @@ const DashboardPage = () => {
       });
 
       if (result.success) {
+        setConnectionStatus('success');
         //alert(`✅ ${result.message} (${result.duration}ms)`);
       } else {
+        setConnectionStatus('error');
         //alert(`❌ ${result.message}: ${result.error}`);
       }
     } catch (error) {
       console.error('Ошибка проверки подключения:', error);
+      setConnectionStatus('error');
       //alert(`Ошибка проверки подключения: ${error.message}`);
+    } finally {
+      setIsTestingConnection(false);
     }
   };
 
@@ -867,17 +997,15 @@ const DashboardPage = () => {
   };
 
   // Добавить элемент в справочник
-  const handleAddReference = async (type, label) => {
-    const value = prompt(`Введите значение для ${label}:`);
-    if (!value) return;
+  const handleAddReference = async (type, value) => {
+    if (!value || !value.trim()) return;
 
     try {
-      await api.addReference(type, value);
-      //alert(`${label} добавлен`);
+      await api.addReference(type, value.trim());
       await loadReferences();
     } catch (error) {
-      console.error(`Ошибка добавления ${label}:`, error);
-      //alert(`Ошибка добавления ${label}: ${error.message}`);
+      console.error(`Ошибка добавления:`, error);
+      //alert(`Ошибка добавления: ${error.message}`);
     }
   };
 
@@ -937,6 +1065,7 @@ const DashboardPage = () => {
             terminalContracts={references.terminal_contracts}
             timeSlots={references.time_slots}
             operationTypes={references.operation_types}
+            isTaskValid={isTaskValid}
           />
         </>
       ) : (
@@ -946,9 +1075,9 @@ const DashboardPage = () => {
               contracts={references.terminal_contracts}
               drivers={references.drivers}
               plates={references.car_numbers}
-              onAddContract={() => handleAddReference('contracts', 'договор')}
-              onAddDriver={() => handleAddReference('drivers', 'водитель')}
-              onAddPlate={() => handleAddReference('autos', 'гос. номер')}
+              onAddContract={(value) => handleAddReference('contracts', value)}
+              onAddDriver={(value) => handleAddReference('drivers', value)}
+              onAddPlate={(value) => handleAddReference('autos', value)}
               onDeleteContract={(id) => handleDeleteReference('contracts', id, 'договор')}
               onDeleteDriver={(id) => handleDeleteReference('drivers', id, 'водитель')}
               onDeletePlate={(id) => handleDeleteReference('autos', id, 'гос. номер')}
@@ -962,6 +1091,8 @@ const DashboardPage = () => {
               onSettingsChange={handleSettingsChange}
               onTestConnection={handleTestConnection}
               onSaveSettings={handleSaveSettings}
+              connectionStatus={connectionStatus}
+              isTestingConnection={isTestingConnection}
             />
           </div>
         </div>
