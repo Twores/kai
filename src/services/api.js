@@ -3,7 +3,7 @@
  * Базовый URL берется из переменной окружения REACT_APP_API_URL
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || window.location.origin;
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 /**
  * Базовая функция для выполнения запросов

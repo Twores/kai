@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import ru from 'date-fns/locale/ru';
+import 'react-datepicker/dist/react-datepicker.css';
 import './DashboardPage.css';
 import Icon from '../../components/Icon/Icon';
 import * as api from '../../services/api';
+
+registerLocale('ru', ru);
 
 const Header = ({ activeScreen, onScreenChange }) => {
   return (
@@ -390,9 +395,68 @@ const SettingsPanel = ({
   );
 };
 
-const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, carNumbers = [], drivers = [], terminalContracts = [], timeSlots = [], operationTypes = [], isTaskValid }) => {
+const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, onCancelTask, carNumbers = [], drivers = [], terminalContracts = [], timeSlots = [], operationTypes = [], isTaskValid }) => {
   const handleChange = (taskId, field, value) => {
     onTaskChange(taskId, field, value);
+  };
+
+  const parseDateValue = (value) => {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    let normalized = value;
+
+    if (typeof normalized === 'string') {
+      if (normalized.includes(' ') && !normalized.includes('T')) {
+        normalized = normalized.replace(' ', 'T');
+      }
+
+      const parsed = new Date(normalized);
+      if (!Number.isNaN(parsed.getTime())) {
+        return parsed;
+      }
+
+      const dotParts = normalized.split('.');
+      if (dotParts.length === 3) {
+        const [day, month, year] = dotParts;
+        const constructed = new Date(Number(year), Number(month) - 1, Number(day));
+        if (!Number.isNaN(constructed.getTime())) {
+          return constructed;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  const formatDateValue = (date) => {
+    if (!date) return '';
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatDateDisplay = (value) => {
+    const parsed = parseDateValue(value);
+    if (!parsed) {
+      return value || '';
+    }
+
+    const day = String(parsed.getDate()).padStart(2, '0');
+    const month = String(parsed.getMonth() + 1).padStart(2, '0');
+    const year = parsed.getFullYear();
+
+    return `${day}.${month}.${year}`;
+  };
+
+  const handleDateSelect = (taskId, date) => {
+    handleChange(taskId, 'date', formatDateValue(date));
   };
 
   // Отладка: проверим, какие данные приходят
@@ -430,15 +494,18 @@ const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, 
               </td>
               <td>
                 {task.isNew || task.isEditing ? (
-                  <input 
-                    type="text" 
-                    className="table-input" 
-                    value={task.date || ''}
-                    onChange={(e) => handleChange(task.id, 'date', e.target.value)}
-                    placeholder="Дата старта"
+                  <DatePicker
+                    selected={parseDateValue(task.date)}
+                    onChange={(date) => handleDateSelect(task.id, date)}
+                    dateFormat="dd.MM.yyyy"
+                    placeholderText="Дата старта"
+                    className="table-input datepicker-input"
+                    wrapperClassName="datepicker-wrapper"
+                    locale="ru"
+                    isClearable
                   />
                 ) : (
-                  task.date
+                  formatDateDisplay(task.date)
                 )}
               </td>
               <td>
@@ -494,7 +561,7 @@ const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, 
                     className="table-input" 
                     value={task.cont || ''}
                     onChange={(e) => handleChange(task.id, 'cont', e.target.value)}
-                    placeholder="Контейнер"
+                    placeholder=""
                   />
                 ) : (
                   task.cont
@@ -507,7 +574,7 @@ const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, 
                     className="table-input" 
                     value={task.rel || ''}
                     onChange={(e) => handleChange(task.id, 'rel', e.target.value)}
-                    placeholder="Релиз"
+                    placeholder=""
                   />
                 ) : (
                   task.rel
@@ -574,6 +641,14 @@ const TaskTable = ({ tasks, onDeleteTask, onTaskChange, onSaveTask, onEditTask, 
                       )}
                     </select>
                     <div className="action-icons">
+                      <button 
+                        className="action-btn action-btn-cancel"
+                        onClick={() => onCancelTask(task.id)}
+                        aria-label="Отменить"
+                        title="Отменить"
+                      >
+                        ✕
+                      </button>
                       <button 
                         className="action-btn action-btn-send" 
                         onClick={() => onSaveTask(task.id)}
@@ -873,6 +948,32 @@ const DashboardPage = () => {
     ));
   };
 
+  const handleCancelTask = (taskId) => {
+    setTasks(prevTasks => {
+      const updatedTasks = [];
+
+      prevTasks.forEach(task => {
+        if (task.id !== taskId) {
+          updatedTasks.push(task);
+          return;
+        }
+
+        if (task.isNew || taskId.toString().startsWith('temp-')) {
+          return;
+        }
+
+        if (task._original) {
+          const originalTask = mapTaskFromAPI(task._original);
+          updatedTasks.push({ ...originalTask, checked: task.checked });
+        } else {
+          updatedTasks.push({ ...task, isEditing: false });
+        }
+      });
+
+      return updatedTasks;
+    });
+  };
+
   // Запустить автоматизацию поочередно
   const handleStartSequential = async () => {
     const selectedTasks = tasks
@@ -1060,6 +1161,7 @@ const DashboardPage = () => {
             onTaskChange={handleTaskChange}
             onSaveTask={handleSaveTask}
             onEditTask={handleEditTask}
+            onCancelTask={handleCancelTask}
             carNumbers={references.car_numbers}
             drivers={references.drivers}
             terminalContracts={references.terminal_contracts}

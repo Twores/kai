@@ -428,9 +428,28 @@
 }
 
 .dash-table { width: 100%; border-collapse: separate; border-spacing: 1px; background-color: #34495E; border-radius: 10px; border: 1px solid #223142; }
-.dash-table thead th { font-weight: 700; padding: 20px 12px; color: #a8c3e8; min-width: 72px; }
+.dash-table thead th { font-weight: 700; padding: 20px 12px; color: #a8c3e8; white-space: nowrap; text-align: center; }
 .dash-table tbody tr { background-color: #2a3747; }
-.dash-table tbody td { padding: 12px;  }
+.dash-table tbody td { padding: 12px; text-align: center; }
+.dash-table tbody td:last-child { padding-right: 72px; }
+
+.dash-table thead th:nth-child(3),
+.dash-table tbody td:nth-child(3) { width: 150px; }
+
+.dash-table thead th:nth-child(4),
+.dash-table tbody td:nth-child(4) { width: 110px; }
+
+.dash-table thead th:nth-child(5),
+.dash-table tbody td:nth-child(5) { width: 130px; }
+
+.dash-table thead th:nth-child(6),
+.dash-table tbody td:nth-child(6) { width: 130px; }
+
+.dash-table thead th:nth-child(7),
+.dash-table tbody td:nth-child(7) { width: 100px; }
+
+.dash-table thead th:nth-child(8),
+.dash-table tbody td:nth-child(8) { width: 120px; }
 
 .dash-table tbody tr td:first-child { border-left: 1px solid #223142; border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
 .dash-table tbody tr td:last-child { border-right: 1px solid #223142; border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
@@ -447,7 +466,21 @@
 .status-new { background-color: #3b82f6; color: #08192f; }
 .status-error { background-color: #fca311; color: #2d1a00; }
 
-.driver-cell { max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.driver-cell { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.datepicker-wrapper {
+  width: 100%;
+}
+
+.datepicker-wrapper .react-datepicker__input-container {
+  width: 100%;
+  display: block;
+}
+
+.datepicker-wrapper .react-datepicker__input-container input {
+  width: 100%;
+  text-align: center;
+}
 
 .table-input {
   background-color: #fff;
@@ -522,6 +555,14 @@
 
 .action-btn-delete {
   color: #ee5e63;
+}
+
+.action-btn-cancel {
+  color: #9ca3af;
+}
+
+.action-btn-cancel:hover {
+  color: #e8f0fd;
 }
 
 .action-btn-send {
